@@ -2,7 +2,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,12 +14,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-o$_#ugerux^)q1%7pvwqz0p@!!5ec-=%yrr&1*oo3p(4lpi=v@"
+# SECRET_KEY = "django-insecure-o$_#ugerux^)q1%7pvwqz0p@!!5ec-=%yrr&1*oo3p(4lpi=v@"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = False
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ["*"]
+
 
 # Auth models
 AUTH_USER_MODEL = "users.User"
@@ -76,10 +82,11 @@ WSGI_APPLICATION = "iam.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,  # Importante en producción
+    )
 }
 
 
