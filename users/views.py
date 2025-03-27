@@ -148,7 +148,7 @@ class CustomAuthorizationView(AuthorizationView):
 
 
 # Vista que maneja la respuesta del usuario desde el frontend
-@method_decorator(login_required, name="dispatch")
+@method_decorator(name="dispatch")
 class HandleAuthorizationView(View):
     def post(self, request):
         data = request.POST  # O request.JSON si el frontend envía JSON
