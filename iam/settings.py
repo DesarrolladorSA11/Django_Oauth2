@@ -124,8 +124,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -145,8 +145,8 @@ REST_FRAMEWORK = {
 OAUTH2_PROVIDER = {
     "ACCESS_TOKEN_EXPIRE_SECONDS": 3600,
     "OAUTH2_VALIDATOR_CLASS": "oauth2_provider.oauth2_validators.OAuth2Validator",
-    "AUTHORIZATION_URL": "http://190.0.2.186:3000/o/authorize/",
-    "TOKEN_URL": "http://190.0.2.186:3000/o/token/",
+    "AUTHORIZATION_URL": "https://django-oauth2.onrender.com/o/authorize/",
+    "TOKEN_URL": "https://django-oauth2.onrender.com/o/token/",
     "SCOPES": {
         "read": "Read access",
         "write": "Write access",
