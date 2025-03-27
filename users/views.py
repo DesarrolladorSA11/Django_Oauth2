@@ -7,10 +7,14 @@ import requests
 from decouple import config
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
+from django.views import View
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+from oauth2_provider.models import Grant, get_application_model
 from oauth2_provider.views import AuthorizationView
 from rest_framework import generics, permissions
 
@@ -35,7 +39,7 @@ class GroupList(generics.ListAPIView):
 
 """ OAUTH2 """
 
-
+"""
 # Generate code challenge & code verifier
 def generate_pkce_pair():
     code_verifier = "".join(
@@ -117,17 +121,54 @@ def oauth_callback(request):
 
     return JsonResponse(response.json(), status=response.status_code)
 
-
+"""
 """Custom view for Oauht2"""
 
 
+# Vista que envía los datos de autorización al frontend
 class CustomAuthorizationView(AuthorizationView):
     def get(self, request, *args, **kwargs):
-        # Enviar los datos necesarios al frontend externo
+        client_id = request.GET.get("client_id")
+        redirect_uri = request.GET.get("redirect_uri")
+        scope = request.GET.get("scope", "")
+
+        try:
+            app = get_application_model().objects.get(client_id=client_id)
+        except get_application_model().DoesNotExist:
+            return JsonResponse({"error": "Invalid client_id"}, status=400)
+
         return JsonResponse(
             {
-                "client_name": self.get_client().name,
-                "scopes": self.get_scopes(),
-                "redirect_uri": self.get_redirect_uri(),
+                "client_name": app.name,
+                "scopes": scope.split(),
+                "redirect_uri": redirect_uri,
+                "client_id": client_id,
             }
         )
+
+
+# Vista que maneja la respuesta del usuario desde el frontend
+@method_decorator(login_required, name="dispatch")
+class HandleAuthorizationView(View):
+    def post(self, request):
+        data = request.POST  # O request.JSON si el frontend envía JSON
+        client_id = data.get("client_id")
+        approve = data.get("approve")  # True si el usuario aprueba
+
+        try:
+            app = get_application_model().objects.get(client_id=client_id)
+        except get_application_model().DoesNotExist:
+            return JsonResponse({"error": "Invalid client_id"}, status=400)
+
+        if approve:
+            grant = Grant.objects.create(
+                user=request.user,
+                application=app,
+                code="GENERATED_AUTH_CODE",  # Aquí se genera un código real
+                expires=None,
+                redirect_uri=data.get("redirect_uri"),
+                scope=data.get("scope"),
+            )
+            return JsonResponse({"redirect": f"{grant.redirect_uri}?code={grant.code}"})
+        else:
+            return JsonResponse({"error": "Authorization denied"}, status=403)
