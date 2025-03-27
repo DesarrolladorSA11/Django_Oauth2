@@ -147,6 +147,7 @@ OAUTH2_PROVIDER = {
     "OAUTH2_VALIDATOR_CLASS": "oauth2_provider.oauth2_validators.OAuth2Validator",
     "AUTHORIZATION_URL": "https://django-oauth2.onrender.com/o/authorize/",
     "TOKEN_URL": "https://django-oauth2.onrender.com/o/token/",
+    "AUTHORIZATION_VIEW": "users.views.CustomAuthorizationView",
     "SCOPES": {
         "read": "Read access",
         "write": "Write access",

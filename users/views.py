@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from django.shortcuts import render
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope
+from oauth2_provider.views import AuthorizationView
 from rest_framework import generics, permissions
 
 from users.models import User
@@ -115,3 +116,18 @@ def oauth_callback(request):
         )
 
     return JsonResponse(response.json(), status=response.status_code)
+
+
+"""Custom view for Oauht2"""
+
+
+class CustomAuthorizationView(AuthorizationView):
+    def get(self, request, *args, **kwargs):
+        # Enviar los datos necesarios al frontend externo
+        return JsonResponse(
+            {
+                "client_name": self.get_client().name,
+                "scopes": self.get_scopes(),
+                "redirect_uri": self.get_redirect_uri(),
+            }
+        )
