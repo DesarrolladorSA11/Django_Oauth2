@@ -152,6 +152,7 @@ OAUTH2_PROVIDER = {
         "write": "Write access",
         "introspect": "Introspect access",
     },
+    "PKCE_REQUIRED": False,  # 🔹 Deshabilita la validación obligatoria de PKCE
 }
 
 SIMPLE_JWT = {
